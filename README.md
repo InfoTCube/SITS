@@ -1,2 +1,2 @@
-# SLMS
-Simple Library Management System
+# SITS
+Simple Inventory Tracking System
