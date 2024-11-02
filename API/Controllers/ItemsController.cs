@@ -30,13 +30,28 @@ public class ItemsController : ControllerBase
         return item is null ? NotFound() : Ok(item);
     }
 
+    [HttpGet("upc/{upc}")]
+    public async Task<ActionResult<IEnumerable<Item>>> GetItemsByUPC(string upc)
+    {
+        var items = await _itemsRepository.GetItemsByUPCAsync(upc);
+        return items.Any() ? Ok(items) : NotFound();
+    }
+
+    [HttpGet("count")]
+    public async Task<ActionResult<IEnumerable<ItemsCountDTO>>> GetItemsCount()
+    {
+        var itemsCount = await _itemsRepository.GetItemsCountAsync();
+        return Ok(itemsCount);
+    }
+
     [HttpPost]
     public async Task<ActionResult<Item>> AddItem(ItemDto item)
     {
         Item itemToCreate = new()
         {
             Name = item.Name,
-            Description = item.Description
+            Description = item.Description,
+            UPC = item.UPC
         };
 
         await _itemsRepository.AddItemAsync(itemToCreate);
@@ -52,6 +67,7 @@ public class ItemsController : ControllerBase
 
         existingItem.Name = item.Name;
         existingItem.Description = item.Description;
+        existingItem.UPC = item.UPC;
 
         _itemsRepository.UpdateItem(existingItem);
         await _itemsRepository.Complete();

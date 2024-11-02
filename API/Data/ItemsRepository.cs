@@ -1,3 +1,4 @@
+using API.DTOs;
 using API.Interfaces;
 using API.Models;
 using Microsoft.EntityFrameworkCore;
@@ -36,6 +37,25 @@ public class ItemsRepository : IItemsRepository
     public async Task<IEnumerable<Item>> GetItemsAsync()
     {
         return await _context.Items.ToListAsync();
+    }
+
+    public async Task<IEnumerable<Item>> GetItemsByUPCAsync(string upc)
+    {
+        return await _context.Items.Where(item => item.UPC == upc).ToListAsync();
+    }
+
+    public async Task<IEnumerable<ItemsCountDTO>> GetItemsCountAsync()
+    {
+        var productCounts = await _context.Items
+        .GroupBy(items => items.UPC)
+        .Select(g => new ItemsCountDTO
+        {
+            UPC = g.Key,
+            Count = g.Count()
+        })
+        .ToListAsync();
+
+        return productCounts;
     }
 
     public void UpdateItem(Item item)
